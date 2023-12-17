@@ -1,19 +1,24 @@
+from typing import Optional, Dict
 from ..constants import DEFAULT_API_TIMEOUT
 from ..helpers.request_helpers import generate_query_path
 from ..helpers.requests import request, Response
 
+
 class Markets(object):
     def __init__(
-        self,
-        indexerHost,
-        api_timeout = None,
+            self,
+            indexerHost: str,
+            api_timeout: Optional[int] = None
     ):
         self.host = indexerHost
         self.api_timeout = api_timeout or DEFAULT_API_TIMEOUT
 
     # ============ Request Helpers ============
 
-    def _get(self, request_path, params = {}) -> Response:
+    # def _get(self, request_path, params={}) -> Response:
+    def _get(self, request_path: str, params: Optional[Dict] = None) -> Response:
+        if params is None:
+            params = {}
         return request(
             generate_query_path(self.host + request_path, params),
             'get',
@@ -64,10 +69,10 @@ class Markets(object):
         return self._get(uri)
 
     def get_perpetual_market_trades(
-        self, 
-        market: str, 
-        starting_before_or_at_height: int = None, 
-        limit: int = None
+            self,
+            market: str,
+            starting_before_or_at_height: int = None,
+            limit: int = None
     ) -> Response:
         '''
         Get trades for a perpetual market
@@ -94,12 +99,12 @@ class Markets(object):
         )
 
     def get_perpetual_market_candles(
-        self,
-        market: str,
-        resolution: str,
-        from_iso: str = None,
-        to_iso: str = None,
-        limit: int = None,
+            self,
+            market: str,
+            resolution: str,
+            from_iso: str = None,
+            to_iso: str = None,
+            limit: int = None,
     ) -> Response:
         '''
         Get Candles
@@ -148,11 +153,11 @@ class Markets(object):
         )
 
     def get_perpetual_market_funding(
-        self,
-        market: str,
-        effective_before_or_at: str = None,
-        effective_before_or_at_height: int = None,
-        limit: int = None,
+            self,
+            market: str,
+            effective_before_or_at: str = None,
+            effective_before_or_at_height: int = None,
+            limit: int = None,
     ) -> Response:
         '''
         Get Candles
@@ -187,10 +192,10 @@ class Markets(object):
                 'limit': limit,
             },
         )
-    
+
     def get_perpetual_markets_sparklines(
-        self,
-        period: str = 'ONE_DAY'
+            self,
+            period: str = 'ONE_DAY'
     ) -> Response:
         '''
         Get Sparklines

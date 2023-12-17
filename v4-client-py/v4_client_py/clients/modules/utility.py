@@ -1,19 +1,24 @@
+from typing import Optional, Dict
 from ..constants import DEFAULT_API_TIMEOUT
 from ..helpers.request_helpers import generate_query_path
 from ..helpers.requests import request, Response
 
+
 class Utility(object):
     def __init__(
-        self,
-        indexerHost,
-        api_timeout = None,
+            self,
+            indexerHost: str,
+            api_timeout: Optional[int] = None
     ):
         self.host = indexerHost
         self.api_timeout = api_timeout or DEFAULT_API_TIMEOUT
 
     # ============ Request Helpers ============
 
-    def _get(self, request_path, params = {}) -> Response:
+    # def _get(self, request_path, params={}) -> Response:
+    def _get(self, request_path: str, params: Optional[Dict] = None) -> Response:
+        if params is None:
+            params = {}
         return request(
             generate_query_path(self.host + request_path, params),
             'get',
@@ -33,7 +38,6 @@ class Utility(object):
         uri = '/v4/time'
         return self._get(uri)
 
-
     def get_height(self) -> Response:
         '''
         Get indexer last block height
@@ -44,7 +48,7 @@ class Utility(object):
         '''
         uri = '/v4/height'
         return self._get(uri)
-    
+
     def screen(self, address) -> Response:
         '''
         Screen an address to see if it is restricted

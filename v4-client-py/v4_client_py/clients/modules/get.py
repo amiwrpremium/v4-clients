@@ -1,4 +1,3 @@
-
 import grpc
 import logging
 
@@ -6,25 +5,9 @@ from typing import Optional
 
 from ..constants import ValidatorConfig
 
-from v4_proto.dydxprotocol.clob.order_pb2 import *
-from v4_proto.dydxprotocol.clob.tx_pb2 import *
 from v4_proto.dydxprotocol.clob.query_pb2 import *
-
-from v4_proto.dydxprotocol.subaccounts.subaccount_pb2 import *
 from v4_proto.dydxprotocol.subaccounts.query_pb2 import *
-
-from v4_proto.dydxprotocol.sending.transfer_pb2 import *
-from v4_proto.dydxprotocol.sending.tx_pb2 import *
-
-from v4_proto.dydxprotocol.assets.genesis_pb2 import *
-from v4_proto.dydxprotocol.assets.query_pb2 import *
-from v4_proto.dydxprotocol.assets.asset_pb2 import *
-
-from v4_proto.dydxprotocol.perpetuals.query_pb2 import *
-from v4_proto.dydxprotocol.perpetuals.perpetual_pb2 import *
-
 from v4_proto.dydxprotocol.prices.query_pb2 import *
-from v4_proto.dydxprotocol.prices.market_price_pb2 import *
 
 from v4_proto.cosmos.base.tendermint.v1beta1 import (
     query_pb2_grpc as tendermint_query_grpc,
@@ -73,21 +56,21 @@ from v4_proto.dydxprotocol.clob import (
     query_pb2 as clob_query,
     clob_pair_pb2 as clob_pair_type,
     equity_tier_limit_config_pb2 as equity_tier_limit_config_type,
-)  
-
+)
 
 DEFAULT_TIMEOUTHEIGHT = 30  # blocks
 
+
 class Get:
     def __init__(
-        self,
-        config: ValidatorConfig,
-        credentials = grpc.ssl_channel_credentials(),
+            self,
+            config: ValidatorConfig,
+            credentials=grpc.ssl_channel_credentials(),
     ):
         # chain stubs
         self.chain_channel = (
-            grpc.secure_channel(config.grpc_endpoint, credentials) if config.ssl_enabled 
-                else grpc.insecure_channel(config.grpc_endpoint)
+            grpc.secure_channel(config.grpc_endpoint, credentials) if config.ssl_enabled
+            else grpc.insecure_channel(config.grpc_endpoint)
         )
         self.config = config
 
@@ -116,7 +99,7 @@ class Get:
         return self.stubCosmosTendermint.GetLatestBlock(
             tendermint_query.GetLatestBlockRequest()
         )
-    
+
     def sync_timeout_height(self):
         try:
             block = self.latest_block()
@@ -124,7 +107,7 @@ class Get:
         except Exception as e:
             logging.debug("error while fetching latest block, setting timeout height to 0:{}".format(e))
             self.timeout_height = 0
-    
+
     def tx(self, tx_hash: str):
         '''
         Get tx
@@ -150,8 +133,11 @@ class Get:
         '''
         Get wallet asset balance
 
+        :param address: required
+        :type address: str
+
         :param denom: required
-        :type demon: str
+        :type denom: str
 
         :returns: Asset balance given the denom
 
@@ -189,7 +175,7 @@ class Get:
         return self.stubSubaccounts.SubaccountAll(
             QueryAllSubaccountRequest()
         )
-    
+
     def subaccount(self, address: str, account_number: int) -> Optional[subaccount_type.Subaccount]:
         '''
         Get subaccount information
@@ -212,7 +198,7 @@ class Get:
         return self.stubClob.ClobPairAll(
             QueryAllClobPairRequest()
         )
-    
+
     def clob_pair(self, pair_id: int) -> clob_pair_type.ClobPair:
         '''
         Get pair information
@@ -225,7 +211,7 @@ class Get:
         return self.stubClob.ClobPair(
             clob_query.QueryGetClobPairRequest(id=pair_id)
         ).clob_pair
-    
+
     def prices(self) -> QueryAllMarketPricesResponse:
         '''
         Get all market prices
@@ -235,7 +221,7 @@ class Get:
         return self.stubPrices.AllMarketPrices(
             QueryAllMarketPricesRequest()
         )
-    
+
     def price(self, market_id: int) -> market_price_type.MarketPrice:
         '''
         Get market price
