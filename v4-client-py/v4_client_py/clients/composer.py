@@ -6,7 +6,7 @@ from v4_proto.dydxprotocol.subaccounts.subaccount_pb2 import SubaccountId
 from v4_proto.dydxprotocol.sending.transfer_pb2 import Transfer, MsgWithdrawFromSubaccount, MsgDepositToSubaccount
 from v4_proto.dydxprotocol.sending.tx_pb2 import MsgCreateTransfer
 
-from v4_client_py.clients.helpers.chain_helpers import is_order_flag_stateful_order, validate_good_til_fields
+from .helpers.chain_helpers import is_order_flag_stateful_order, validate_good_til_fields
 
 
 class Composer:
