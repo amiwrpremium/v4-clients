@@ -1,15 +1,16 @@
-
 """Network configurations."""
 
 import warnings
 from dataclasses import dataclass
 from typing import Optional, Union
 
+
 class NetworkConfigError(RuntimeError):
     """Network config error.
 
     :param RuntimeError: Runtime error
     """
+
 
 URL_PREFIXES = (
     "grpc+https",
@@ -44,12 +45,12 @@ class NetworkConfig:
         if self.url == "":
             raise NetworkConfigError("URL must be set")
         if not any(
-            map(
-                lambda x: self.url.startswith(  # noqa: # pylint: disable=unnecessary-lambda
-                    x
-                ),
-                URL_PREFIXES,
-            )
+                map(
+                    lambda x: self.url.startswith(  # noqa: # pylint: disable=unnecessary-lambda
+                        x
+                    ),
+                    URL_PREFIXES,
+                )
         ):
             prefix_list = ", ".join(map(lambda x: f'"{x}"', URL_PREFIXES))
             raise NetworkConfigError(
@@ -131,11 +132,14 @@ class NetworkConfig:
 
         :return: fetch mainnet configurations
         """
-        warnings.warn(
-            "fetch_mainnet is deprecated, use fetchai_mainnet instead",
-            DeprecationWarning,
+        return NetworkConfig(
+            chain_id="dydx-mainnet-1",
+            url="grpc+https://dydx-ops-grpc.kingnodes.com/",
+            fee_minimum_gas_price=0,
+            fee_denomination="afet",
+            staking_denomination="afet",
+            faucet_url=None,
         )
-        return cls.fetchai_mainnet()
 
     @classmethod
     def latest_stable_testnet(cls) -> "NetworkConfig":

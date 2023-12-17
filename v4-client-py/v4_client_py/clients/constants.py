@@ -1,24 +1,24 @@
+from typing import Optional
 from enum import Enum
-from ..chain.aerial.config import NetworkConfig
 
 
 # ------------ API URLs ------------
-INDEXER_API_HOST_MAINNET = None
+INDEXER_API_HOST_MAINNET = 'https://indexer.dydx.trade'
 INDEXER_API_HOST_TESTNET = 'https://dydx-testnet.imperator.co'
 
-INDEXER_WS_HOST_MAINNET = None
+INDEXER_WS_HOST_MAINNET = 'wss://indexer.dydx.trade/v4/ws'
 INDEXER_WS_HOST_TESTNET = 'wss://indexer.v4testnet.dydx.exchange/v4/ws'
 
 FAUCET_API_HOST_TESTNET = 'https://faucet.v4testnet.dydx.exchange'
 
-VALIDATOR_API_HOST_MAINNET = None
+VALIDATOR_API_HOST_MAINNET = 'https://api.dydx.nodestake.top'
 VALIDATOR_API_HOST_TESTNET = 'https://dydx-testnet-archive.allthatnode.com'
 
-VALIDATOR_GRPC_MAINNET = None
+VALIDATOR_GRPC_MAINNET = 'dydx-ops-grpc.kingnodes.com'
 VALIDATOR_GRPC_TESTNET = 'dydx-testnet-archive.allthatnode.com:9090'
 
 # ------------ Ethereum Network IDs ------------
-NETWORK_ID_MAINNET = None
+NETWORK_ID_MAINNET = 'dydx-mainnet-1'
 NETWORK_ID_TESTNET = 'dydx-testnet-4'
 
 # ------------ Market Statistic Day Types ------------
@@ -65,7 +65,6 @@ TRANSFER_STATUS_UNCONFIRMED = 'UNCONFIRMED'
 MARKET_BTC_USD = 'BTC-USD'
 MARKET_ETH_USD = 'ETH-USD'
 
-
 # ------------ Assets ------------
 ASSET_USDC = 'USDC'
 ASSET_BTC = 'BTC'
@@ -85,6 +84,7 @@ MAX_MEMO_CHARACTERS = 256
 
 BECH32_PREFIX = 'dydx'
 
+
 class BroadcastMode(Enum):
     BroadcastTxSync = 0
     BroadcastTxCommit = 1
@@ -92,21 +92,22 @@ class BroadcastMode(Enum):
 
 class IndexerConfig:
     def __init__(
-        self,
-        rest_endpoint: str,
-        websocket_endpoint: str,
+            self,
+            rest_endpoint: str,
+            websocket_endpoint: str,
     ):
         if rest_endpoint.endswith('/'):
             rest_endpoint = rest_endpoint[:-1]
         self.rest_endpoint = rest_endpoint
         self.websocket_endpoint = websocket_endpoint
 
+
 class ValidatorConfig:
     def __init__(
-        self,
-        grpc_endpoint: str,
-        chain_id: str,
-        ssl_enabled: bool,
+            self,
+            grpc_endpoint: str,
+            chain_id: str,
+            ssl_enabled: bool,
     ):
         self.grpc_endpoint = grpc_endpoint
         self.chain_id = chain_id
@@ -115,11 +116,11 @@ class ValidatorConfig:
 
 class Network:
     def __init__(
-        self,
-        env: str,
-        validator_config: ValidatorConfig,
-        indexer_config: IndexerConfig,
-        faucet_endpoint: str,
+            self,
+            env: str,
+            validator_config: ValidatorConfig,
+            indexer_config: IndexerConfig,
+            faucet_endpoint: Optional[str] = None,
     ):
         self.env = env
         self.validator_config = validator_config
@@ -130,12 +131,12 @@ class Network:
 
     @classmethod
     def testnet(cls):
-        validator_config=ValidatorConfig(
+        validator_config = ValidatorConfig(
             grpc_endpoint=VALIDATOR_GRPC_TESTNET,
-            chain_id=NETWORK_ID_TESTNET, 
+            chain_id=NETWORK_ID_TESTNET,
             ssl_enabled=True
         )
-        indexer_config=IndexerConfig(
+        indexer_config = IndexerConfig(
             rest_endpoint=INDEXER_API_HOST_TESTNET,
             websocket_endpoint=INDEXER_WS_HOST_TESTNET,
         )
@@ -148,12 +149,12 @@ class Network:
 
     @classmethod
     def mainnet(cls):
-        validator_config=ValidatorConfig(
+        validator_config = ValidatorConfig(
             grpc_endpoint=VALIDATOR_GRPC_MAINNET,
-            chain_id=NETWORK_ID_MAINNET, 
+            chain_id=NETWORK_ID_MAINNET,
             ssl_enabled=True
         )
-        indexer_config=IndexerConfig(
+        indexer_config = IndexerConfig(
             rest_endpoint=INDEXER_API_HOST_MAINNET,
             websocket_endpoint=INDEXER_WS_HOST_MAINNET,
         )
