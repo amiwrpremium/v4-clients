@@ -1,6 +1,6 @@
-
-from enum import Flag, auto, Enum
+from enum import Flag, auto
 from v4_proto.dydxprotocol.clob.order_pb2 import Order
+
 
 class OrderType(Flag):
     MARKET = auto()
@@ -10,26 +10,29 @@ class OrderType(Flag):
     STOP_LIMIT = auto()
     TAKE_PROFIT_LIMIT = auto()
 
+
 class OrderSide(Flag):
     BUY = auto()
     SELL = auto()
 
+
 # FE enums. Do not pass these directly into the order proto TimeInForce field.
 class OrderTimeInForce(Flag):
-    GTT = auto()    # Good Til Time
-    IOC = auto()    # Immediate or Cancel
-    FOK = auto()    # Fill or Kill
+    GTT = auto()  # Good Til Time
+    IOC = auto()  # Immediate or Cancel
+    FOK = auto()  # Fill or Kill
+
 
 class OrderExecution(Flag):
-    DEFAULT = 0         # Default. Note proto enums start at 0, which is why this start at 0.
-    IOC = auto()        # Immediate or Cancel
+    DEFAULT = 0  # Default. Note proto enums start at 0, which is why this start at 0.
+    IOC = auto()  # Immediate or Cancel
     POST_ONLY = auto()  # Post-only
-    FOK = auto()        # Fill or Kill
+    FOK = auto()  # Fill or Kill
+
 
 # Enums to use in order proto fields. Use proto generated fields once that's fixed.
 # should match https://github.com/dydxprotocol/v4-chain/blob/main/proto/dydxprotocol/clob/order.proto#L159
 class Order_TimeInForce(Flag):
-
     '''
     TIME_IN_FORCE_UNSPECIFIED - TIME_IN_FORCE_UNSPECIFIED represents the default behavior where an
     order will first match with existing orders on the book, and any
@@ -60,6 +63,7 @@ class Order_TimeInForce(Flag):
     '''
     TIME_IN_FORCE_FILL_OR_KILL = 3
 
+
 ORDER_FLAGS_SHORT_TERM = 0
 ORDER_FLAGS_LONG_TERM = 64
 ORDER_FLAGS_CONDITIONAL = 32
@@ -68,8 +72,9 @@ SHORT_BLOCK_WINDOW = 20
 
 QUOTE_QUANTUMS_ATOMIC_RESOLUTION = -6
 
+
 def is_order_flag_stateful_order(
-    order_flag: int
+        order_flag: int
 ) -> bool:
     if order_flag == ORDER_FLAGS_SHORT_TERM:
         return False
@@ -80,10 +85,11 @@ def is_order_flag_stateful_order(
     else:
         raise ValueError('Invalid order flag')
 
+
 def validate_good_til_fields(
-    is_stateful_order: bool,
-    good_til_block_time: int,
-    good_til_block: int,
+        is_stateful_order: bool,
+        good_til_block_time: int,
+        good_til_block: int,
 ):
     if is_stateful_order:
         if good_til_block_time == 0:
@@ -112,43 +118,48 @@ def validate_good_til_fields(
                 )
             )
 
+
 def round(
-    number: float,
-    base: int
+        number: float,
+        base: int
 ) -> int:
     return int(number / base) * base
 
+
 def calculate_quantums(
-    size: float, 
-    atomic_resolution: int, 
-    step_base_quantums: int,
+        size: float,
+        atomic_resolution: int,
+        step_base_quantums: int,
 ):
-    raw_quantums = size * 10**(-1 * atomic_resolution)
+    raw_quantums = size * 10 ** (-1 * atomic_resolution)
     quantums = round(raw_quantums, step_base_quantums)
     # step_base_quantums functions as the minimum order size
     return max(quantums, step_base_quantums)
 
+
 def calculate_subticks(
-    price: float,
-    atomic_resolution: int,
-    quantum_conversion_exponent: int,
-    subticks_per_tick: int
+        price: float,
+        atomic_resolution: int,
+        quantum_conversion_exponent: int,
+        subticks_per_tick: int
 ):
     exponent = atomic_resolution - quantum_conversion_exponent - QUOTE_QUANTUMS_ATOMIC_RESOLUTION
-    raw_subticks = price * 10**(exponent)
+    raw_subticks = price * 10 ** (exponent)
     subticks = round(raw_subticks, subticks_per_tick)
     return max(subticks, subticks_per_tick)
 
+
 def calculate_side(
-    side: OrderSide,
+        side: OrderSide,
 ) -> Order.Side:
     return Order.SIDE_BUY if side == OrderSide.BUY else Order.SIDE_SELL
-    
+
+
 def calculate_time_in_force(
-    type: OrderType, 
-    time_in_force: OrderTimeInForce, 
-    execution: OrderExecution, 
-    post_only: bool
+        type: OrderType,
+        time_in_force: OrderTimeInForce,
+        execution: OrderExecution,
+        post_only: bool
 ) -> Order_TimeInForce:
     if type == OrderType.MARKET:
         return Order_TimeInForce.TIME_IN_FORCE_IOC
@@ -189,11 +200,13 @@ def calculate_time_in_force(
     else:
         raise Exception("Unexpected code path: time_in_force")
 
+
 def calculate_execution_condition(reduce_only: bool) -> int:
     if reduce_only:
         return Order.EXECUTION_CONDITION_REDUCE_ONLY
     else:
         return Order.EXECUTION_CONDITION_UNSPECIFIED
+
 
 def calculate_order_flags(type: OrderType, time_in_force: OrderTimeInForce) -> int:
     if type == OrderType.MARKET:
@@ -205,4 +218,3 @@ def calculate_order_flags(type: OrderType, time_in_force: OrderTimeInForce) -> i
             return ORDER_FLAGS_SHORT_TERM
     else:
         return ORDER_FLAGS_CONDITIONAL
-    

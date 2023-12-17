@@ -1,3 +1,4 @@
+from typing import Optional, Any, Dict
 import json
 
 import requests
@@ -15,13 +16,23 @@ session.headers.update({
 
 
 class Response(object):
-    def __init__(self, status_code: int, data = {}, headers = None):
+    def __init__(self, status_code: int, data: Optional[Dict[str, Any]] = None,
+                 headers: Optional[Dict[str, Any]] = None):
+        if data is None:
+            data = {}
         self.status_code = status_code
         self.data = data
         self.headers = headers
 
 
-def request(uri, method, headers = None, data_values = {}, api_timeout = None):
+def request(
+        uri: str, method: str, headers: Optional[Dict[str, Any]] = None,
+        data_values: Optional[Dict[str, Any]] = None, api_timeout: Optional[int] = None
+) -> Response:
+    if headers is None:
+        headers = {}
+    if data_values is None:
+        data_values = {}
     response = send_request(
         uri,
         method,
@@ -37,7 +48,7 @@ def request(uri, method, headers = None, data_values = {}, api_timeout = None):
     if response.content:
         return Response(response.status_code, response.json(), response.headers)
     else:
-        return Response(response.status_code, '{}', response.headers)
+        return Response(response.status_code, {}, response.headers)
 
 
 def send_request(uri, method, headers=None, **kwargs):
