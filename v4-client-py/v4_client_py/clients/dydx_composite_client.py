@@ -4,39 +4,39 @@ import grpc
 from datetime import datetime, timedelta
 
 from v4_proto.dydxprotocol.clob.tx_pb2 import MsgPlaceOrder
-from v4_client_py.clients.helpers.chain_helpers import (
+from .helpers.chain_helpers import (
     QUOTE_QUANTUMS_ATOMIC_RESOLUTION,
     Order,
     Order_TimeInForce,
-    OrderType, 
-    OrderSide, 
-    OrderTimeInForce, 
+    OrderType,
+    OrderSide,
+    OrderTimeInForce,
     OrderExecution,
     calculate_side,
-    calculate_quantums, 
-    calculate_subticks, 
-    calculate_time_in_force, 
+    calculate_quantums,
+    calculate_subticks,
+    calculate_time_in_force,
     calculate_order_flags,
     ORDER_FLAGS_SHORT_TERM,
     SHORT_BLOCK_WINDOW,
     is_order_flag_stateful_order,
 )
 
-from v4_client_py.clients.constants import Network
-from v4_client_py.clients.dydx_indexer_client import IndexerClient
-from v4_client_py.clients.dydx_validator_client import ValidatorClient
-from v4_client_py.clients.dydx_subaccount import Subaccount
+from .constants import Network
+from .dydx_indexer_client import IndexerClient
+from .dydx_validator_client import ValidatorClient
+from .dydx_subaccount import Subaccount
 
-from v4_client_py.chain.aerial.tx_helpers import SubmittedTx
+from ..chain.aerial.tx_helpers import SubmittedTx
 
 
 class CompositeClient:
     def __init__(
-        self,
-        network: Network,
-        api_timeout = None,
-        send_options = None,
-        credentials = grpc.ssl_channel_credentials(),
+            self,
+            network: Network,
+            api_timeout=None,
+            send_options=None,
+            credentials=grpc.ssl_channel_credentials(),
     ):
         self.indexer_client = IndexerClient(network.indexer_config, api_timeout, send_options)
         self.validator_client = ValidatorClient(network.validator_config, credentials)
@@ -56,10 +56,10 @@ class CompositeClient:
     # good_til_block is the exact block number the short term order will expire on.
     # good_til_time_in_seconds is the number of seconds until the stateful order expires.
     def generate_good_til_fields(
-        self,
-        order_flags: int,
-        good_til_block: int,
-        good_til_time_in_seconds: int,
+            self,
+            order_flags: int,
+            good_til_block: int,
+            good_til_time_in_seconds: int,
     ) -> Tuple[int, int]:
         is_stateful_order = is_order_flag_stateful_order(order_flags)
         if is_stateful_order:
@@ -85,21 +85,21 @@ class CompositeClient:
     # The quantum and subticks are calculated and submitted
 
     def place_order(
-        self,
-        subaccount: Subaccount,
-        market: str,
-        type: OrderType,
-        side: OrderSide,
-        price: float,
-        size: float,
-        client_id: int,
-        time_in_force: OrderTimeInForce,
-        good_til_block: int,
-        good_til_time_in_seconds: int,
-        execution: OrderExecution,
-        post_only: bool,
-        reduce_only: bool,
-        trigger_price: float = None,
+            self,
+            subaccount: Subaccount,
+            market: str,
+            type: OrderType,
+            side: OrderSide,
+            price: float,
+            size: float,
+            client_id: int,
+            time_in_force: OrderTimeInForce,
+            good_til_block: int,
+            good_til_time_in_seconds: int,
+            execution: OrderExecution,
+            post_only: bool,
+            reduce_only: bool,
+            trigger_price: float = None,
     ) -> SubmittedTx:
         '''
         Place order
@@ -161,16 +161,17 @@ class CompositeClient:
         return self.validator_client.post.send_message(subaccount=subaccount, msg=msg, zeroFee=True)
 
     def place_short_term_order(
-        self,
-        subaccount: Subaccount,
-        market: str,
-        side: OrderSide,
-        price: float,
-        size: float,
-        client_id: int,
-        good_til_block: int,
-        time_in_force: Order_TimeInForce,
-        reduce_only: bool,
+            self,
+            subaccount: Subaccount,
+            market: str,
+            side: OrderSide,
+            type: OrderType,
+            price: float,
+            size: float,
+            client_id: int,
+            good_til_block: int,
+            time_in_force: Order_TimeInForce,
+            reduce_only: bool,
     ) -> SubmittedTx:
         '''
         Place Short-Term order
@@ -183,6 +184,9 @@ class CompositeClient:
 
         :param side: required
         :type side: Order.Side
+
+        :param type: required
+        :type type: Order.Type
 
         :param price: required
         :type price: float
@@ -217,7 +221,7 @@ class CompositeClient:
             reduce_only=reduce_only,
         )
         return self.validator_client.post.send_message(subaccount=subaccount, msg=msg, zeroFee=True)
-    
+
     def calculate_client_metadata(self, order_type: OrderType) -> int:
         '''
         Calculate Client Metadata
@@ -227,7 +231,8 @@ class CompositeClient:
 
         :returns: Client Metadata
         '''
-        return 1 if (order_type == OrderType.MARKET or order_type == OrderType.STOP_MARKET or order_type == OrderType.TAKE_PROFIT_MARKET) else 0
+        return 1 if (
+                    order_type == OrderType.MARKET or order_type == OrderType.STOP_MARKET or order_type == OrderType.TAKE_PROFIT_MARKET) else 0
 
     def calculate_condition_type(self, order_type: OrderType) -> Order.ConditionType:
         '''
@@ -256,7 +261,7 @@ class CompositeClient:
             quantum_conversion_exponent: int,
             subticks_per_tick: int,
             trigger_price: float,
-        ) -> int:
+    ) -> int:
         '''
         Calculate Conditional Order Trigger Subticks
 
@@ -287,21 +292,21 @@ class CompositeClient:
             raise ValueError('order_type is invalid')
 
     def place_order_message(
-        self,
-        subaccount: Subaccount,
-        market: str,
-        type: OrderType,
-        side: OrderSide,
-        price: float,
-        size: float,
-        client_id: int,
-        time_in_force: OrderTimeInForce,
-        good_til_block: int,
-        good_til_time_in_seconds: int,
-        execution: OrderExecution,
-        post_only: bool,
-        reduce_only: bool,
-        trigger_price: float = None,
+            self,
+            subaccount: Subaccount,
+            market: str,
+            type: OrderType,
+            side: OrderSide,
+            price: float,
+            size: float,
+            client_id: int,
+            time_in_force: OrderTimeInForce,
+            good_til_block: int,
+            good_til_time_in_seconds: int,
+            execution: OrderExecution,
+            post_only: bool,
+            reduce_only: bool,
+            trigger_price: float = None,
     ) -> MsgPlaceOrder:
         markets_response = self.indexer_client.markets.get_perpetual_markets(market)
         market = markets_response.data['markets'][market]
@@ -323,12 +328,12 @@ class CompositeClient:
         client_metadata = self.calculate_client_metadata(type)
         condition_type = self.calculate_condition_type(type)
         conditional_order_trigger_subticks = self.calculate_conditional_order_trigger_subticks(
-            type, 
-            atomic_resolution, 
-            quantum_conversion_exponent, 
-            subticks_per_tick, 
+            type,
+            atomic_resolution,
+            quantum_conversion_exponent,
+            subticks_per_tick,
             trigger_price
-            )
+        )
         return self.validator_client.post.composer.compose_msg_place_order(
             address=subaccount.address,
             subaccount_number=subaccount.subaccount_number,
@@ -348,17 +353,17 @@ class CompositeClient:
         )
 
     def place_short_term_order_message(
-        self,
-        subaccount: Subaccount,
-        market: str,
-        type: OrderType,
-        side: OrderSide,
-        price: float,
-        size: float,
-        client_id: int,
-        time_in_force: Order_TimeInForce,
-        good_til_block: int,
-        reduce_only: bool,
+            self,
+            subaccount: Subaccount,
+            market: str,
+            type: OrderType,
+            side: OrderSide,
+            price: float,
+            size: float,
+            client_id: int,
+            time_in_force: Order_TimeInForce,
+            good_til_block: int,
+            reduce_only: bool,
     ) -> MsgPlaceOrder:
         # Validate the GoodTilBlock.
         self.validate_good_til_block(good_til_block=good_til_block)
@@ -395,14 +400,14 @@ class CompositeClient:
         )
 
     def cancel_order(
-        self, 
-        subaccount: Subaccount,
-        client_id: int,
-        market: str,
-        order_flags: int,
-        good_til_time_in_seconds: int,
-        good_til_block: int,
-    )  -> SubmittedTx:
+            self,
+            subaccount: Subaccount,
+            client_id: int,
+            market: str,
+            order_flags: int,
+            good_til_time_in_seconds: int,
+            good_til_block: int,
+    ) -> SubmittedTx:
         '''
         Cancel order
 
@@ -421,8 +426,8 @@ class CompositeClient:
         :param good_til_block: required
         :type good_til_block: int
 
-        :param good_til_block_time: required
-        :type good_til_block_time: int
+        :param good_til_time_in_seconds: required
+        :type good_til_time_in_seconds: int
 
         :returns: Tx information
         '''
@@ -437,14 +442,13 @@ class CompositeClient:
 
         return self.validator_client.post.send_message(subaccount=subaccount, msg=msg, zeroFee=True)
 
-
     def cancel_short_term_order(
-        self,
-        subaccount: Subaccount,
-        client_id: int,
-        market: str,
-        good_til_block: int,
-    )  -> SubmittedTx:
+            self,
+            subaccount: Subaccount,
+            client_id: int,
+            market: str,
+            good_til_block: int,
+    ) -> SubmittedTx:
         '''
         Cancel order
 
@@ -453,9 +457,6 @@ class CompositeClient:
 
         :param client_id: required
         :type client_id: int
-
-        :param clob_pair_id: required
-        :type clob_pair_id: int
 
         :param good_til_block: required
         :type good_til_block: int
@@ -473,15 +474,14 @@ class CompositeClient:
 
         return self.validator_client.post.send_message(subaccount=subaccount, msg=msg, zeroFee=True)
 
-
     def cancel_order_message(
-        self,
-        subaccount: Subaccount,
-        market: str,
-        client_id: int,
-        order_flags: int,
-        good_til_time_in_seconds: int,
-        good_til_block: int,
+            self,
+            subaccount: Subaccount,
+            market: str,
+            client_id: int,
+            order_flags: int,
+            good_til_time_in_seconds: int,
+            good_til_block: int,
     ) -> MsgPlaceOrder:
         # Validate the GoodTilBlock for short term orders.
         if not is_order_flag_stateful_order(order_flags):
@@ -508,14 +508,13 @@ class CompositeClient:
             good_til_block_time=good_til_block_time,
         )
 
-
     def transfer_to_subaccount(
-        self, 
-        subaccount: Subaccount,
-        recipient_address: str,
-        recipient_subaccount_number: int,
-        amount: float,
-    )  -> SubmittedTx:
+            self,
+            subaccount: Subaccount,
+            recipient_address: str,
+            recipient_subaccount_number: int,
+            amount: float,
+    ) -> SubmittedTx:
         '''
         Cancel order
 
@@ -538,14 +537,14 @@ class CompositeClient:
             recipient_address=recipient_address,
             recipient_subaccount_number=recipient_subaccount_number,
             asset_id=0,
-            amount=amount * 10**6,
+            amount=amount * 10 ** 6,
         )
-    
+
     def deposit_to_subaccount(
-        self, 
-        subaccount: Subaccount,
-        amount: float,
-    )  -> SubmittedTx:
+            self,
+            subaccount: Subaccount,
+            amount: float,
+    ) -> SubmittedTx:
         '''
         Cancel order
 
@@ -562,12 +561,12 @@ class CompositeClient:
             asset_id=0,
             quantums=amount * 10 ** (- QUOTE_QUANTUMS_ATOMIC_RESOLUTION),
         )
-    
+
     def withdraw_from_subaccount(
-        self, 
-        subaccount: Subaccount,
-        amount: float,
-    )  -> SubmittedTx:
+            self,
+            subaccount: Subaccount,
+            amount: float,
+    ) -> SubmittedTx:
         '''
         Cancel order
 
