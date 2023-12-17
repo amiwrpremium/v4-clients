@@ -18,7 +18,7 @@ REQUIREMENTS = [
 
 setup(
     name='dydx-v4-python',
-    version='1.0.1',
+    version='1.0.2',
     packages=find_packages(),
     package_data={
     },
