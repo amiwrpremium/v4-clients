@@ -5,13 +5,14 @@ import time
 
 from .constants import IndexerConfig
 
+
 class SocketClient:
     def __init__(
-        self,
-        config: IndexerConfig, 
-        on_message=None, 
-        on_open=None, 
-        on_close=None
+            self,
+            config: IndexerConfig,
+            on_message=None,
+            on_open=None,
+            on_close=None
     ):
         self.url = config.websocket_endpoint
         self.ws = None
@@ -23,10 +24,12 @@ class SocketClient:
         self.ping_sent_time = None
 
     def connect(self):
-        self.ws = websocket.WebSocketApp(self.url,
-                                         on_open=self._on_open,
-                                         on_message=self._on_message,
-                                         on_close=self._on_close)
+        self.ws = websocket.WebSocketApp(
+            self.url,
+            on_open=self._on_open,
+            on_message=self._on_message,
+            on_close=self._on_close
+        )
 
         self.ws.run_forever()
 

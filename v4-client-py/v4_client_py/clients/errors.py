@@ -3,6 +3,7 @@ class DydxError(Exception):
     Will never be raised naked; more specific subclasses of this exception will
     be raised when appropriate."""
 
+
 class ValueTooLargeError(DydxError):
     pass
 

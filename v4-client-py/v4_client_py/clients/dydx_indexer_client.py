@@ -3,12 +3,13 @@ from .modules.account import Account
 from .modules.markets import Markets
 from .modules.utility import Utility
 
+
 class IndexerClient(object):
     def __init__(
-        self,
-        config: IndexerConfig,
-        api_timeout = None,
-        send_options = None,
+            self,
+            config: IndexerConfig,
+            api_timeout=None,
+            send_options=None,
     ):
         self.config = config
         self.api_timeout = api_timeout or DEFAULT_API_TIMEOUT
@@ -18,7 +19,6 @@ class IndexerClient(object):
         self._markets = Markets(config.rest_endpoint)
         self._account = Account(config.rest_endpoint)
         self._utility = Utility(config.rest_endpoint)
-
 
     @property
     def markets(self) -> Markets:
@@ -34,7 +34,7 @@ class IndexerClient(object):
         require dYdX address.
         '''
         return self._account
-    
+
     @property
     def utility(self) -> Utility:
         '''
