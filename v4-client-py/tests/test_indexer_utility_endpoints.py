@@ -1,4 +1,3 @@
-
 from v4_client_py.clients import IndexerClient, Subaccount
 from v4_client_py.clients.constants import Network
 
@@ -8,8 +7,9 @@ subaccount = Subaccount.from_mnemonic(DYDX_TEST_MNEMONIC)
 address = subaccount.address
 
 client = IndexerClient(
-    config=Network.testnet().indexer_config,
+    config=Network.mainnet().indexer_config,
 )
+
 
 def test_get_time():
     try:
@@ -22,7 +22,8 @@ def test_get_time():
     except:
         print('failed to get time')
         assert False
-        
+
+
 def test_get_height():
     # Get indexer height
     try:
@@ -36,6 +37,7 @@ def test_get_height():
         print('failed to get height')
         assert False
 
+
 def test_screen():
     try:
         screen_response = client.utility.screen(address)
@@ -45,4 +47,3 @@ def test_screen():
     except:
         print('failed to screen address')
         assert False
-

@@ -1,10 +1,10 @@
-
 from v4_client_py.clients import IndexerClient
 from v4_client_py.clients.constants import Network, MARKET_BTC_USD
 
 client = IndexerClient(
-    config=Network.testnet().indexer_config,
+    config=Network.mainnet().indexer_config,
 )
+
 
 def test_get_perpetual_markets():
     # Get perp markets
@@ -17,6 +17,7 @@ def test_get_perpetual_markets():
         print('failed to get markets')
         assert False
 
+
 def test_get_perpetual_market():
     try:
         btc_market_response = client.markets.get_perpetual_markets(MARKET_BTC_USD)
@@ -26,6 +27,7 @@ def test_get_perpetual_market():
     except:
         print('failed to get BTC market')
         assert False
+
 
 def test_get_perpetual_markets_sparklines():
     # Get sparklines
@@ -50,7 +52,8 @@ def test_get_perpetual_market_trades():
     except:
         print('failed to get market trades')
         assert False
-        
+
+
 def test_get_perpetual_market_orderbook():
     # Get perp market orderbook
     try:
@@ -67,6 +70,7 @@ def test_get_perpetual_market_orderbook():
     except:
         print('failed to get market orderbook')
         assert False
+
 
 def test_get_market_candles():
     # Get perp market candles
@@ -95,7 +99,7 @@ def test_get_perpetual_market_funding():
     try:
         btc_market_funding_response = client.markets.get_perpetual_market_funding(MARKET_BTC_USD)
         print(btc_market_funding_response.data)
-        btc_market_funding= btc_market_funding_response.data['historicalFunding']
+        btc_market_funding = btc_market_funding_response.data['historicalFunding']
         if len(btc_market_funding) > 0:
             btc_market_funding_0 = btc_market_funding[0]
             print(btc_market_funding_0)

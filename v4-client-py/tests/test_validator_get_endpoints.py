@@ -3,10 +3,11 @@ from v4_client_py.clients.constants import Network
 
 from tests.constants import DYDX_TEST_ADDRESS
 
-network = Network.testnet()
+network = Network.mainnet()
 client = ValidatorClient(network.validator_config)
 address = DYDX_TEST_ADDRESS
 print('address:')
+
 
 def test_get_account():
     try:
@@ -18,6 +19,7 @@ def test_get_account():
         print(e)
         assert False
 
+
 def test_get_bank_balances():
     try:
         bank_balances = client.get.bank_balances(address)
@@ -28,9 +30,11 @@ def test_get_bank_balances():
         print(e)
         assert False
 
+
 def test_get_bank_balance():
     try:
-        bank_balance = client.get.bank_balance(address, 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5')
+        bank_balance = client.get.bank_balance(address,
+                                               'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5')
         print('bank balance:')
         print(bank_balance)
     except Exception as e:
@@ -48,7 +52,8 @@ def test_get_subaccounts():
         print('failed to get all subaccounts')
         print(e)
         assert False
-        
+
+
 def test_get_subaccount():
     try:
         subaccount = client.get.subaccount(address, 0)
@@ -58,6 +63,7 @@ def test_get_subaccount():
         print('failed to get subaccount')
         print(e)
         assert False
+
 
 def test_get_clob_pairs():
     try:
@@ -69,6 +75,7 @@ def test_get_clob_pairs():
         print(e)
         assert False
 
+
 def test_get_clob_pair():
     try:
         clob_pair = client.get.clob_pair(1)
@@ -78,6 +85,7 @@ def test_get_clob_pair():
         print('failed to get clob pair')
         print(e)
         assert False
+
 
 def test_get_prices():
     try:
@@ -89,6 +97,7 @@ def test_get_prices():
         print(e)
         assert False
 
+
 def test_get_price():
     try:
         price = client.get.price(1)
@@ -98,6 +107,7 @@ def test_get_price():
         print('failed to get price')
         print(e)
         assert False
+
 
 def test_get_equity_tier_limit_configuration():
     try:

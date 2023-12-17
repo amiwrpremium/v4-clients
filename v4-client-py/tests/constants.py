@@ -3,7 +3,6 @@ from v4_client_py.clients.constants import ORDER_SIDE_BUY
 from v4_client_py.clients.helpers.chain_helpers import ORDER_FLAGS_SHORT_TERM
 from v4_proto.dydxprotocol.clob.order_pb2 import Order
 
-
 DEFAULT_HOST = 'http://localhost:8080'
 DEFAULT_NETWORK_ID = 1001
 SEVEN_DAYS_S = 7 * 24 * 60 * 60
